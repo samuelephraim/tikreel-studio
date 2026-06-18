@@ -3,8 +3,8 @@ import { useState, useCallback, useEffect, useRef } from "react";
 // ══════════════════════════════════════════════
 //  CONFIG  — edit these before going live
 // ══════════════════════════════════════════════
-const PAYSTACK_PUBLIC_KEY = "psk_live_825a08aa33d6c43de8f1b05694665283d415c837"; // YOUR KEY
-const ADMIN_PASSWORD      = "tiktok$444";   // change this!
+const PAYSTACK_PUBLIC_KEY = "pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxx"; // YOUR KEY
+const ADMIN_PASSWORD      = "admin2024";   // change this!
 const MONTHLY_AMOUNT      = 200000;        // ₦2,000 in kobo
 const YEARLY_AMOUNT       = 1500000;       // ₦15,000 in kobo
 const FREE_LIMIT          = 3;
@@ -566,22 +566,21 @@ export default function App(){
     setLoading(true); setTemplates([]);
     if(!isPro){ const n=freeUsed+1; setFreeUsed(n); lss("tikr_free_used",n); }
     try{
-      const prompt=`You are a viral TikTok content strategist. Generate exactly ${count} unique TikTok reel templates for the topic: "${activeTopic.label.replace(/[^\w\s]/g,"").trim()}".
-Format: ${activeFormat.label.replace(/[^\w\s]/g,"").trim()}
-Tone: ${activeTone}
-Rules:
-- Ready to use, punchy, TikTok-optimised
-- Hook, body, CTA included
-- 5-7 relevant hashtags
-- Authentic, not corporate
-Respond ONLY with valid JSON array, no markdown:
-[{"id":"1","title":"Short catchy name","hook":"Opening line","body":"Main content","cta":"Call to action","hashtags":"#tag1 #tag2","tip":"One filming tip"}]`;
-      const res =await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:[{role:"user",content:prompt}]})});
-      const data=await res.json();
-      const raw =data.content?.map(b=>b.text||"").join("")||"[]";
-      const parsed=JSON.parse(raw.replace(/```json|```/g,"").trim());
+      const res = await fetch("/api/generate", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topic:  activeTopic.label.replace(/[^\w\s]/g,"").trim(),
+          format: activeFormat.label.replace(/[^\w\s]/g,"").trim(),
+          tone:   activeTone,
+          count,
+        }),
+      });
+      const data   = await res.json();
+      if(data.error) throw new Error(data.error);
+      const parsed = data.templates || [];
       setTemplates(parsed.map((t,i)=>({...t,id:`${Date.now()}-${i}`,topic:activeTopic.id,format:activeFormat.id,tone:activeTone})));
-    }catch{ setTemplates([{id:"err",title:"Error",hook:"Could not generate. Please try again.",body:"",cta:"",hashtags:"",tip:""}]); }
+    }catch(e){ setTemplates([{id:"err",title:"Error",hook:"Could not generate: "+e.message,body:"Make sure your ANTHROPIC_API_KEY is set in Vercel.",cta:"",hashtags:"",tip:""}]); }
     setLoading(false);
   },[activeTopic,activeFormat,activeTone,count,isPro,freeUsed]);
 
