@@ -3,11 +3,11 @@ import { useState, useCallback, useEffect, useRef } from "react";
 // ══════════════════════════════════════════════
 //  CONFIG  — edit these before going live
 // ══════════════════════════════════════════════
-const PAYSTACK_PUBLIC_KEY = "pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxx"; // YOUR KEY
-const ADMIN_PASSWORD      = "admin2024";   // change this!
+const PAYSTACK_PUBLIC_KEY = "sk_live_825a08aa33d6c43de8f1b05694665283d415c837"; // YOUR KEY
+const ADMIN_PASSWORD      = "tiktok$444";   // change this!
 const MONTHLY_AMOUNT      = 200000;        // ₦2,000 in kobo
 const YEARLY_AMOUNT       = 1500000;       // ₦15,000 in kobo
-const FREE_LIMIT          = 3;
+const FREE_LIMIT          = 5;
 
 // ══════════════════════════════════════════════
 //  DATA
